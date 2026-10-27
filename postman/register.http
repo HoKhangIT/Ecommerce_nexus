@@ -1,0 +1,50 @@
+@token = DÁN_ACCESS_TOKEN_CỦA_BẠN_VÀO_ĐÂY
+
+### 1. Create Category ###
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Gaming Gear",
+    "slug": "gaming-gear"
+}
+
+### 2. Create Product (Initial stock = 10) ###
+POST http://localhost:8080/api/v1/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "categoryId": 1,
+    "sku": "KB-K68-PRO",
+    "name": "Mechanical Keyboard K68",
+    "description": "Wireless hot-swappable mechanical keyboard",
+    "price": 59.99,
+    "initialStock": 10
+}
+
+### 3. Get Product By ID (Run twice to see Redis Cache in action!) ###
+GET http://localhost:8080/api/v1/products/1
+
+### 4. Add Item to Redis Cart ###
+POST http://localhost:8080/api/v1/cart/items
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "productId": 1,
+    "quantity": 2
+}
+
+### 5. View Redis Cart ###
+GET http://localhost:8080/api/v1/cart
+Authorization: Bearer {{token}}
+
+### 6. Checkout Order (Deducts stock -> Clears Redis Cart -> Sends RabbitMQ Event) ###
+POST http://localhost:8080/api/v1/orders/checkout
+Authorization: Bearer {{token}}
+
+### 7. View Order History ###
+GET http://localhost:8080/api/v1/orders/my-orders
+Authorization: Bearer {{token}}
